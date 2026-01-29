@@ -49,6 +49,8 @@ class MCCInterface:
         output_data = np.zeros(aout_pts, dtype = np.float64)
         output_data[100:200] = 5. # actual volts
         output_data[300:400] = 5. # actual volts
+        output_data[500:700] = 5.
+        output_data[800:810] = 5.
         # allocate a buffer for the output
         output_handle = ul.scaled_win_buf_alloc(aout_pts)
         # Get the pointer to the output data
@@ -62,8 +64,10 @@ class MCCInterface:
                       aout_pts, aout_rate, self.ao_range, output_handle, ao_options)
 
         # scan
-        ul.a_in_scan(self.board_number, self.in_low_channel, self.in_high_channel,
-                     total_count, ain_rate, self.ai_range, memhandle, 0)
+        actual_rate = ul.a_in_scan(self.board_number, self.in_low_channel, self.in_high_channel,
+                                   total_count, ain_rate, self.ai_range, memhandle, 0)
+
+        print(actual_rate)
 
         # convert to numpy array
         np_data_array = np.ctypeslib.as_array(data_array, (total_count,))
@@ -80,6 +84,7 @@ class MCCInterface:
 
         # free memory and clean up
         ul.win_buf_free(memhandle)
+        #ul.win_buf_free(output_handle)
         data_array = None
         ul.stop_background(self.board_number, FunctionType.AOFUNCTION)
 
