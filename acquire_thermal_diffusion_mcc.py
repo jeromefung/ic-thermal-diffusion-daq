@@ -47,7 +47,7 @@ class MCCInterface:
 
         self.in_low_channel = 0
         self.in_high_channel = 6
-        self.n_in_channels - self.in_high_channel - self.in_low_channel + 1
+        self.n_in_channels = self.in_high_channel - self.in_low_channel + 1
         self.out_low_channel = 0
         self.out_high_channel = 0
 
@@ -73,7 +73,7 @@ class MCCInterface:
         total_input_pts = ain_pts_per_channel * self.n_in_channels
          
         # allocate memory buffer for input
-        input_memhandle = ul.win_buf_alloc(total_count)
+        input_memhandle = ul.win_buf_alloc(total_input_pts)
         data_array = ctypes.cast(input_memhandle, ctypes.POINTER(ctypes.c_ushort))
 
         # set up output
@@ -107,7 +107,7 @@ class MCCInterface:
         # to avoid a concatenate/copy, initialize the entire array
         voltage_array = np.zeros(total_input_pts + ain_pts_per_channel)
         # interleave the times
-        voltage_array[::self.n_in_channels] = np.arange(ain_pts_per_channel)/actual_rate
+        voltage_array[::(self.n_in_channels+1)] = np.arange(ain_pts_per_channel)/actual_rate
         for i in np.arange(len(np_data_array)):
             voltage_array[i + 1 + np.floor(i/self.n_in_channels).astype('int')] = ul.to_eng_units(self.board_number, 
                                                                                                   self.ai_range, 
