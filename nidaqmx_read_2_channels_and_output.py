@@ -3,10 +3,13 @@ from nidaqmx.system import System
 from nidaqmx.stream_readers import AnalogMultiChannelReader
 from nidaqmx.stream_writers import AnalogSingleChannelWriter
 
+import numpy as np
+
 system = System.local()
 
 # autodetect device name assuming only 1 is connected
 device_name = system.devices[0].name
+print(device_name)
 
 # configuration
 sample_rate = 100 # Hz, use this for both analog in and out
