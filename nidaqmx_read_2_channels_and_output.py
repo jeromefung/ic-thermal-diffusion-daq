@@ -24,17 +24,19 @@ output[900:910] = 5.
 
 
 with nidaqmx.Task() as read_task, nidaqmx.Task() as write_task:
-    read_task.ai_channels.add_ai_voltage_chan(device_name + '/ai0')
-    read_task.ai_channels.add_ai_voltage_chan(device_name + '/ai1')
+    read_task.ai_channels.add_ai_voltage_chan(device_name + '/ai0',
+                                              terminal_config = nidaqmx.constants.TerminalConfiguration.RSE)
+    read_task.ai_channels.add_ai_voltage_chan(device_name + '/ai1',
+                                              terminal_config = nidaqmx.constants.TerminalConfiguration.RSE)
     write_task.ao_channels.add_ao_voltage_chan(device_name + '/ao0')
 
     # Use analog out sample clock to control analog in
-    read_task.timing.cfg_samp_clk_timing(sample_rate, source = device_name + '/ao0',
+    read_task.timing.cfg_samp_clk_timing(sample_rate, #source = device_name + '/ao0',
                                          samps_per_chan = n_samples_channel)
     write_task.timing.cfg_samp_clk_timing(sample_rate, samps_per_chan = n_samples_channel)
 
     # set analog in to trigger the analog out
-    write_task.triggers.start_trigger.cfg_dig_edge_start_trig(trigger_source = device_name + '/ai/StartTrigger')
+    #write_task.triggers.start_trigger.cfg_dig_edge_start_trig(trigger_source = device_name + '/ai0/StartTrigger')
 
     # create stream reader/writer object
     reader = AnalogMultiChannelReader(read_task.in_stream)
@@ -48,7 +50,7 @@ with nidaqmx.Task() as read_task, nidaqmx.Task() as write_task:
     # start tasks
     write_task.start()
     read_task.start()
-    reader.read_many_sample(input_data)
+    reader.read_many_sample(input_data, timeout = 40)
 
     write_task.wait_until_done()
     read_task.wait_until_done()
