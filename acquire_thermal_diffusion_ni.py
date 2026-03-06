@@ -41,6 +41,7 @@ from nidaqmx.stream_readers import AnalogMultiChannelReader
 from nidaqmx.stream_writers import AnalogSingleChannelWriter
 
 import numpy as np
+import sys
 
 '''
 Strategy for simultaneous analog input and output relies on using the analog output sample clock to
